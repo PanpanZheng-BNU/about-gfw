@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自动配置生成</title>
+    <!-- 新 Bootstrap4 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<style>
+    h3 {
+        text-align: center;
+    }
+
+    input + label {
+        margin-top: 0.5em;
+    }
+
+    label {
+        font-size: 1.2em;
+        margin-right: 0.5em;
+    }
+
+    .generate-button {
+        margin-top: 2em;
+    }
+
+    .form-group {
+        vertical-align: top;
+        border-radius: 0.5em;
+        margin-bottom: 1em;
+        padding-bottom: 1em;
+        margin-top: 1em;
+        padding-top: 1em;
+        width: 40vw;
+    }
+
+    .form-group {
+        margin-left: 8vw;
+    }
+
+    div + .form-group {
+        margin-left: 4vw;
+    }
+
+    #input-domain-name {
+        background-color: #F8F5DF;
+    }
+
+    #input-v2ray {
+        background-color: #FFD37A;
+    }
+
+    #input-trojan {
+        background-color: #F7E077;
+    }
+
+    #if-upstream-div {
+        border-radius: 0.5em;
+        margin-left: 8vw;
+        width: 84vw;
+        background-color: #C0D0AF;
+        margin-top: 2em;
+        padding-top: 2em;
+        padding-bottom: 2em;
+        text-align: center;
+    }
+
+    #conf-results {
+        margin-left: 8vw;
+        width: 84vw;
+        border-radius: 0.5em;
+    }
+
+    #conf-results #nginx {
+        background-color: #C0D0AF;
+        font-weight: bold;
+    }
+
+    #conf-results #v2ray {
+        background-color: #FFD37A;
+        font-weight: bold;
+    }
+
+    #conf-results #trojan {
+        background-color: #F7E077;
+        font-weight: bold;
+    }
+</style>
+
+<style>
+    /**
+* prism.js Github theme based on GitHub's theme.
+* @author Sam Clarke
+*/
+    code[class*="language-"],
+    pre[class*="language-"] {
+        color: #333;
+        background: none;
+        font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        text-align: left;
+        white-space: pre;
+        word-spacing: normal;
+        word-break: normal;
+        word-wrap: normal;
+        line-height: 1.4;
+
+        -moz-tab-size: 8;
+        -o-tab-size: 8;
+        tab-size: 8;
+
+        -webkit-hyphens: none;
+        -moz-hyphens: none;
+        -ms-hyphens: none;
+        hyphens: none;
+    }
+
+    /* Code blocks */
+    pre[class*="language-"] {
+        padding: .8em;
+        overflow: auto;
+        /* border: 1px solid #ddd; */
+        border-radius: 3px;
+        /* background: #fff; */
+        background: #f5f5f5;
+    }
+
+    /* Inline code */
+    :not(pre) > code[class*="language-"] {
+        padding: .1em;
+        border-radius: .3em;
+        white-space: normal;
+        background: #f5f5f5;
+    }
+
+    .token.comment,
+    .token.blockquote {
+        color: #969896;
+    }
+
+    .token.cdata {
+        color: #183691;
+    }
+
+    .token.doctype,
+    .token.punctuation,
+    .token.variable,
+    .token.macro.property {
+        color: #333;
+    }
+
+    .token.operator,
+    .token.important,
+    .token.keyword,
+    .token.rule,
+    .token.builtin {
+        color: #a71d5d;
+    }
+
+    .token.string,
+    .token.url,
+    .token.regex,
+    .token.attr-value {
+        color: #183691;
+    }
+
+    .token.property,
+    .token.number,
+    .token.boolean,
+    .token.entity,
+    .token.atrule,
+    .token.constant,
+    .token.symbol,
+    .token.command,
+    .token.code {
+        color: #0086b3;
+    }
+
+    .token.tag,
+    .token.selector,
+    .token.prolog {
+        color: #63a35c;
+    }
+
+    .token.function,
+    .token.namespace,
+    .token.pseudo-element,
+    .token.class,
+    .token.class-name,
+    .token.pseudo-class,
+    .token.id,
+    .token.url-reference .token.variable,
+    .token.attr-name {
+        color: #795da3;
+    }
+
+    .token.entity {
+        cursor: help;
+    }
+
+    .token.title,
+    .token.title .token.punctuation {
+        font-weight: bold;
+        color: #1d3e81;
+    }
+
+    .token.list {
+        color: #ed6a43;
+    }
+
+    .token.inserted {
+        background-color: #eaffea;
+        color: #55a532;
+    }
+
+    .token.deleted {
+        background-color: #ffecec;
+        color: #bd2c00;
+    }
+
+    .token.bold {
+        font-weight: bold;
+    }
+
+    .token.italic {
+        font-style: italic;
+    }
+
+
+    /* JSON */
+    .language-json .token.property {
+        color: #183691;
+    }
+
+    .language-markup .token.tag .token.punctuation {
+        color: #333;
+    }
+
+    /* CSS */
+    code.language-css,
+    .language-css .token.function {
+        color: #0086b3;
+    }
+
+    /* YAML */
+    .language-yaml .token.atrule {
+        color: #63a35c;
+    }
+
+    code.language-yaml {
+        color: #183691;
+    }
+
+    /* Ruby */
+    .language-ruby .token.function {
+        color: #333;
+    }
+
+    /* Markdown */
+    .language-markdown .token.url {
+        color: #795da3;
+    }
+
+    /* Makefile */
+    .language-makefile .token.symbol {
+        color: #795da3;
+    }
+
+    .language-makefile .token.variable {
+        color: #183691;
+    }
+
+    .language-makefile .token.builtin {
+        color: #0086b3;
+    }
+
+    /* Bash */
+    .language-bash .token.keyword {
+        color: #0086b3;
+    }
+
+    /* highlight */
+    pre[data-line] {
+        position: relative;
+        padding: 1em 0 1em 3em;
+    }
+
+    pre[data-line] .line-highlight-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: transparent;
+        display: block;
+        width: 100%;
+    }
+
+    pre[data-line] .line-highlight {
+        position: absolute;
+        left: 0;
+        right: 0;
+        padding: inherit 0;
+        margin-top: 1em;
+        background: hsla(24, 20%, 50%, .08);
+        background: linear-gradient(to right, hsla(24, 20%, 50%, .1) 70%, hsla(24, 20%, 50%, 0));
+        pointer-events: none;
+        line-height: inherit;
+        white-space: pre;
+    }
+
+    pre[data-line] .line-highlight:before,
+    pre[data-line] .line-highlight[data-end]:after {
+        content: attr(data-start);
+        position: absolute;
+        top: .4em;
+        left: .6em;
+        min-width: 1em;
+        padding: 0 .5em;
+        background-color: hsla(24, 20%, 50%, .4);
+        color: hsl(24, 20%, 95%);
+        font: bold 65%/1.5 sans-serif;
+        text-align: center;
+        vertical-align: .3em;
+        border-radius: 999px;
+        text-shadow: none;
+        box-shadow: 0 1px white;
+    }
+
+    pre[data-line] .line-highlight[data-end]:after {
+        content: attr(data-end);
+        top: auto;
+        bottom: .4em;
+    }
+
+    html body {
+        font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        color: #333;
+        background-color: #fff;
+        overflow: initial;
+        box-sizing: border-box;
+        word-wrap: break-word
+    }
+
+    html body > :first-child {
+        margin-top: 0
+    }
+
+    html body h1, html body h2, html body h3, html body h4, html body h5, html body h6 {
+        line-height: 1.2;
+        margin-top: 1em;
+        margin-bottom: 16px;
+        color: #000
+    }
+
+    html body h1 {
+        font-size: 2.25em;
+        font-weight: 300;
+        padding-bottom: .3em
+    }
+
+    html body h2 {
+        font-size: 1.75em;
+        font-weight: 400;
+        padding-bottom: .3em
+    }
+
+    html body h3 {
+        font-size: 1.5em;
+        font-weight: 500
+    }
+
+    html body h4 {
+        font-size: 1.25em;
+        font-weight: 600
+    }
+
+    html body h5 {
+        font-size: 1.1em;
+        font-weight: 600
+    }
+
+    html body h6 {
+        font-size: 1em;
+        font-weight: 600
+    }
+
+    html body h1, html body h2, html body h3, html body h4, html body h5 {
+        font-weight: 600
+    }
+
+    html body h5 {
+        font-size: 1em
+    }
+
+    html body h6 {
+        color: #5c5c5c
+    }
+
+    html body strong {
+        color: #000
+    }
+
+    html body del {
+        color: #5c5c5c
+    }
+
+    html body a:not([href]) {
+        color: inherit;
+        text-decoration: none
+    }
+
+    html body a {
+        color: #08c;
+        text-decoration: none
+    }
+
+    html body a:hover {
+        color: #00a3f5;
+        text-decoration: none
+    }
+
+    html body img {
+        max-width: 100%
+    }
+
+    html body > p {
+        margin-top: 0;
+        margin-bottom: 16px;
+        word-wrap: break-word
+    }
+
+    html body > ul, html body > ol {
+        margin-bottom: 16px
+    }
+
+    html body ul, html body ol {
+        padding-left: 2em
+    }
+
+    html body ul.no-list, html body ol.no-list {
+        padding: 0;
+        list-style-type: none
+    }
+
+    html body ul ul, html body ul ol, html body ol ol, html body ol ul {
+        margin-top: 0;
+        margin-bottom: 0
+    }
+
+    html body li {
+        margin-bottom: 0
+    }
+
+    html body li.task-list-item {
+        list-style: none
+    }
+
+    html body li > p {
+        margin-top: 0;
+        margin-bottom: 0
+    }
+
+    html body .task-list-item-checkbox {
+        margin: 0 .2em .25em -1.8em;
+        vertical-align: middle
+    }
+
+    html body .task-list-item-checkbox:hover {
+        cursor: pointer
+    }
+
+    html body blockquote {
+        margin: 16px 0;
+        font-size: inherit;
+        padding: 0 15px;
+        color: #5c5c5c;
+        background-color: #f0f0f0;
+        border-left: 4px solid #d6d6d6
+    }
+
+    html body blockquote > :first-child {
+        margin-top: 0
+    }
+
+    html body blockquote > :last-child {
+        margin-bottom: 0
+    }
+
+    html body hr {
+        height: 4px;
+        margin: 32px 0;
+        background-color: #d6d6d6;
+        border: 0 none
+    }
+
+    html body table {
+        margin: 10px 0 15px 0;
+        border-collapse: collapse;
+        border-spacing: 0;
+        display: block;
+        width: 100%;
+        overflow: auto;
+        word-break: normal;
+        word-break: keep-all
+    }
+
+    html body table th {
+        font-weight: bold;
+        color: #000
+    }
+
+    html body table td, html body table th {
+        border: 1px solid #d6d6d6;
+        padding: 6px 13px
+    }
+
+    html body dl {
+        padding: 0
+    }
+
+    html body dl dt {
+        padding: 0;
+        margin-top: 16px;
+        font-size: 1em;
+        font-style: italic;
+        font-weight: bold
+    }
+
+    html body dl dd {
+        padding: 0 16px;
+        margin-bottom: 16px
+    }
+
+    html body code {
+        font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+        font-size: .85em !important;
+        color: #000;
+        background-color: #f0f0f0;
+        border-radius: 3px;
+        padding: .2em 0
+    }
+
+    html body code::before, html body code::after {
+        letter-spacing: -0.2em;
+        content: "\00a0"
+    }
+
+    html body pre > code {
+        padding: 0;
+        margin: 0;
+        font-size: .85em !important;
+        word-break: normal;
+        white-space: pre;
+        background: transparent;
+        border: 0
+    }
+
+    html body .highlight {
+        margin-bottom: 16px
+    }
+
+    html body .highlight pre, html body pre {
+        padding: 1em;
+        overflow: auto;
+        font-size: .85em !important;
+        line-height: 1.45;
+        border: #d6d6d6;
+        border-radius: 3px
+    }
+
+    html body .highlight pre {
+        margin-bottom: 0;
+        word-break: normal
+    }
+
+    html body pre code, html body pre tt {
+        display: inline;
+        max-width: initial;
+        padding: 0;
+        margin: 0;
+        overflow: initial;
+        line-height: inherit;
+        word-wrap: normal;
+        background-color: transparent;
+        border: 0
+    }
+
+    html body pre code:before, html body pre tt:before, html body pre code:after, html body pre tt:after {
+        content: normal
+    }
+
+    html body p, html body blockquote, html body ul, html body ol, html body dl, html body pre {
+        margin-top: 0;
+        margin-bottom: 16px
+    }
+
+    html body kbd {
+        color: #000;
+        border: 1px solid #d6d6d6;
+        border-bottom: 2px solid #c7c7c7;
+        padding: 2px 4px;
+        background-color: #f0f0f0;
+        border-radius: 3px
+    }
+
+    @media print {
+        html body {
+            background-color: #fff
+        }
+
+        html body h1, html body h2, html body h3, html body h4, html body h5, html body h6 {
+            color: #000;
+            page-break-after: avoid
+        }
+
+        html body blockquote {
+            color: #5c5c5c
+        }
+
+        html body pre {
+            page-break-inside: avoid
+        }
+
+        html body table {
+            display: table
+        }
+
+        html body img {
+            display: block;
+            max-width: 100%;
+            max-height: 100%
+        }
+
+        html body pre, html body code {
+            word-wrap: break-word;
+            white-space: pre
+        }
+    }
+
+    .markdown-preview {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box
+    }
+
+    .markdown-preview .pagebreak, .markdown-preview .newpage {
+        page-break-before: always
+    }
+
+    .markdown-preview pre.line-numbers {
+        position: relative;
+        padding-left: 3.8em;
+        counter-reset: linenumber
+    }
+
+    .markdown-preview pre.line-numbers > code {
+        position: relative
+    }
+
+    .markdown-preview pre.line-numbers .line-numbers-rows {
+        position: absolute;
+        pointer-events: none;
+        top: 1em;
+        font-size: 100%;
+        left: 0;
+        width: 3em;
+        letter-spacing: -1px;
+        border-right: 1px solid #999;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none
+    }
+
+    .markdown-preview pre.line-numbers .line-numbers-rows > span {
+        pointer-events: none;
+        display: block;
+        counter-increment: linenumber
+    }
+
+    .markdown-preview pre.line-numbers .line-numbers-rows > span:before {
+        content: counter(linenumber);
+        color: #999;
+        display: block;
+        padding-right: .8em;
+        text-align: right
+    }
+
+    .markdown-preview .mathjax-exps .MathJax_Display {
+        text-align: center !important
+    }
+
+    .markdown-preview:not([for="preview"]) .code-chunk .btn-group {
+        display: none
+    }
+
+    .markdown-preview:not([for="preview"]) .code-chunk .status {
+        display: none
+    }
+
+    .markdown-preview:not([for="preview"]) .code-chunk .output-div {
+        margin-bottom: 16px
+    }
+
+    .scrollbar-style::-webkit-scrollbar {
+        width: 8px
+    }
+
+    .scrollbar-style::-webkit-scrollbar-track {
+        border-radius: 10px;
+        background-color: transparent
+    }
+
+    .scrollbar-style::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: rgba(150, 150, 150, 0.66);
+        border: 4px solid rgba(150, 150, 150, 0.66);
+        background-clip: content-box
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode]) {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        overflow: auto
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+        position: relative;
+        top: 0
+    }
+
+    @media screen and (min-width: 914px) {
+        html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+            padding: 2em calc(50% - 457px + 2em)
+        }
+    }
+
+    @media screen and (max-width: 914px) {
+        html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+            padding: 2em
+        }
+    }
+
+    @media screen and (max-width: 450px) {
+        html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
+            font-size: 14px !important;
+            padding: 1em
+        }
+    }
+
+    @media print {
+        html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn {
+            display: none
+        }
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn {
+        position: fixed;
+        bottom: 8px;
+        left: 8px;
+        font-size: 28px;
+        cursor: pointer;
+        color: inherit;
+        z-index: 99;
+        width: 32px;
+        text-align: center;
+        opacity: .4
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn {
+        opacity: 1
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 300px;
+        height: 100%;
+        padding: 32px 0 48px 0;
+        font-size: 14px;
+        box-shadow: 0 0 4px rgba(150, 150, 150, 0.33);
+        box-sizing: border-box;
+        overflow: auto;
+        background-color: inherit
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar {
+        width: 8px
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track {
+        border-radius: 10px;
+        background-color: transparent
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: rgba(150, 150, 150, 0.66);
+        border: 4px solid rgba(150, 150, 150, 0.66);
+        background-clip: content-box
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a {
+        text-decoration: none
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul {
+        padding: 0 1.6em;
+        margin-top: .8em
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc li {
+        margin-bottom: .8em
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul {
+        list-style-type: none
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
+        left: 300px;
+        width: calc(100% - 300px);
+        padding: 2em calc(50% - 457px - 150px);
+        margin: 0;
+        box-sizing: border-box
+    }
+
+    @media screen and (max-width: 1274px) {
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
+            padding: 2em
+        }
+    }
+
+    @media screen and (max-width: 450px) {
+        html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
+            width: 100%
+        }
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview {
+        left: 50%;
+        transform: translateX(-50%)
+    }
+
+    html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc {
+        display: none
+    }
+
+    /* Please visit the URL below for more information: */
+    /*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+</style>
+<body>
+<div>
+    <div id="if-upstream-div" class="dropdown" style="">
+        <p style="font-size: 1.5em">是否使用Nginx对443端口进行分流</p>
+        <button id="all-button" type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown">
+        </button>
+        <ul class="dropdown-menu">
+            <li value="1"><a class="dropdown-item" id="option1">是</a></li>
+            <li value="2"><a class="dropdown-item" id="option2">否</a></li>
+        </ul>
+    </div>
+    <br/>
+
+    <div id="conf-input">
+        <div id="input-v2ray" class="form-group col-6" style="display:inline-block;">
+            <label for="v2ray-domain-name">v2ray Domain Name: </label>
+            <input type="text" class="form-control" id="v2ray-domain-name">
+            <label for="v2ray-uuid">v2ray UUID: </label>
+            <input type="text" class="form-control" id="v2ray-uuid">
+            <label for="v2ray-alertId">v2ray alertId: </label>
+            <input type="number" class="form-control" id="v2ray-alertId">
+            <label for="v2ray-ws-path">v2ray ws path: </label>
+            <input type="text" class="form-control" id="v2ray-ws-path">
+            <div class="generate-button" style="text-align:center">
+                <button type="btn" class="btn btn-outline-dark" id="generate-uuid">自动生成UUID</button>
+            </div>
+        </div>
+        <div id="input-trojan" class="form-group col-6" style="display:inline-block;">
+            <label for="trojan-domain-name">trojan Domain Name: </label>
+            <input type="text" class="form-control" id="trojan-domain-name">
+            <label for="trojan-password">trojan Password: </label>
+            <input type="text" class="form-control" id="trojan-password">
+        </div>
+
+        <br/> <br/>
+        <div id="generate-buttons" style="text-align:center">
+
+        </div>
+
+        <br/>
+
+        <div class="card" id="conf-results">
+        </div>
+
+
+    </div>
+</div>
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<!-- bootstrap.bundle.min.js 用于弹窗、提示、下拉菜单，包含了 popper.min.js -->
+<script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+<!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+
+    function uuid() {
+        var s = [];
+        var hexDigits = "0123456789abcdef";
+        for (var i = 0; i < 36; i++) {
+            s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+        }
+        s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        s[8] = s[13] = s[18] = s[23] = "-";
+        var uuid = s.join("");
+        return uuid;
+    }
+
+    function printSSL(domainName, server) {
+        $(`#${server}-ssl`).empty();
+        $(`#${server}-ssl`).append(`<h3 style="text-align:center">${server} SSL证书申请</h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash">
+<span class="token comment">############################### ${server} SSL证书申请 ###############################</span>
+<span class="token comment">#证书申请</span>
+<span class="token function">acme.sh</span> --issue -d <span class="token important">${domainName}</span> --standalone -k ec-256 --force
+
+<span class="token comment"># 创建用于存放证书的目录</span>
+<span class="token function">mkdir</span> /data
+<span class="token function">mkdir</span> /data/${domainName}
+
+<span class="token comment"># 安装证书</span>
+<span class="token function">acme.sh</span> --installcert -d <span class="token important">${domainName}</span> --fullchainpath <span class="token important">/data/${domainName}/fullchain.crt</span> --keypath <span class="token important">/data/${domainName}/privkey.key</span> --ecc --force
+</pre>`);
+    }
+
+    function printNginxUpstream(v2rayDomainName, trojanDomainName) {
+        $("#nginx-upstream-result").empty();
+        $("#nginx-upstream-result").append(`<h3>Nginx 分流配置</h3>
+        <pre data-role="codeBlock" data-info="nginx" class="language-nginx">
+<span class="token keyword">user</span>  nginx<span class="token punctuation">;</span>
+<span class="token keyword">pid</span>   <span class="token operator">/</span>var<span class="token operator">/</span>run<span
+                            class="token operator">/</span>nginx<span class="token punctuation">.</span><span
+                            class="token keyword">pid</span><span class="token punctuation">;</span>
+
+<span class="token comment">####################### 需要修改的分界线 上界 #######################</span>
+<span class="token comment"># 此处插入以下内容</span>
+<span class="token comment"># 流量转发核心配置</span>
+stream <span class="token punctuation">{</span>
+    <span class="token comment"># 这里就是 SNI 识别，将域名映射成一个配置名</span>
+    <span class="token keyword">map</span> <span class="token variable">$ssl_preread_server_name</span> <span
+                            class="token variable">$backend_name</span> <span class="token punctuation">{</span>
+        <span class="token important">${v2rayDomainName}</span>     vmess<span class="token punctuation">;</span>
+        <span class="token important">${trojanDomainName}</span>    trojan<span class="token punctuation">;</span>
+    <span class="token comment"># 域名都不匹配情况下的默认值</span>
+        default web<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment"># web，配置转发详情</span>
+    <span class="token keyword">upstream</span> web <span class="token punctuation">{</span>
+        <span class="token keyword">server</span> <span class="token number">127.0</span><span
+                            class="token number">.0</span><span class="token number">.1</span><span
+                            class="token punctuation">:</span><span class="token number">10240</span><span
+                            class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment"># trojan，配置转发详情</span>
+    <span class="token keyword">upstream</span> trojan <span class="token punctuation">{</span>
+        <span class="token keyword">server</span> <span class="token number">127.0</span><span
+                            class="token number">.0</span><span class="token number">.1</span><span
+                            class="token punctuation">:</span><span class="token number">10241</span><span
+                            class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment"># vmess，配置转发详情</span>
+    <span class="token keyword">upstream</span> vmess <span class="token punctuation">{</span>
+        <span class="token keyword">server</span> <span class="token number">127.0</span><span
+                            class="token number">.0</span><span class="token number">.1</span><span
+                            class="token punctuation">:</span><span class="token number">10242</span><span
+                            class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment"># 监听 443 并开启 ssl_preread</span>
+    <span class="token keyword">server</span> <span class="token punctuation">{</span>
+        <span class="token keyword">listen</span> <span class="token number">443</span> reuseport<span
+                            class="token punctuation">;</span>
+        <span class="token keyword">listen</span> <span class="token punctuation">[</span><span
+                            class="token punctuation">:</span><span class="token punctuation">:</span><span
+                            class="token punctuation">]</span><span class="token punctuation">:</span><span
+                            class="token number">443</span> reuseport<span class="token punctuation">;</span>
+        <span class="token keyword">proxy_pass</span>  <span class="token variable">$backend_name</span><span
+                            class="token punctuation">;</span>
+        ssl_preread on<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token comment">####################### 需要修改的分界线 下界 #######################</span>
+
+<span class="token keyword">http</span> <span class="token punctuation">{</span>
+  <span class="token comment"># 这块保持不变即可</span>
+<span class="token punctuation">}</span>
+</pre>
+`);
+    }
+
+
+    function printNginxUpstreamResult() {
+        $("#conf-results").append(
+            `<div id="nginx-div">
+             <div class="card-header" id="nginx">nginx分流</div>
+             <div class="card-body" id="nginx-upstream-result"></div>
+             </div>`)
+    }
+
+    function printV2rayResult() {
+        $("#conf-results").append(`
+        <div id="v2ray-div">
+        <div class="card-header" id="v2ray">v2ray配置文件</div>
+        <div class="card-body" id="v2ray-ssl"></div>
+        <div class="card-body" id="v2ray-nginx"></div>
+        <div class="card-body" id="v2ray-conf"></div>
+        </div>`);
+    }
+
+    function printTrojanResult() {
+        $("#conf-results").append(`
+        <div id="trojan-div">
+        <div class="card-header" id="trojan">trojan配置文件</div>
+        <div class="card-body" id="trojan-ssl"></div>
+        <div class="card-body" id="trojan-nginx"></div>
+        <div class="card-body" id="trojan-conf"></div>
+        </div>`);
+    }
+
+    function printV2rayNginx(portNumber, ifUpstream) {
+        if (ifUpstream == 1) {
+            var nginxPort = 10242;
+        } else {
+            var nginxPort = 443;
+        }
+
+        $("#v2ray-nginx").append(`<h3>v2ray Nginx 配置文件</h3>
+         <pre data-role="codeBlock" data-info="nginx" class="language-nginx"><span class="token keyword">server</span> <span
+                            class="token punctuation">{</span>
+  <span class="token keyword">listen</span>  <span class="token number">${nginxPort}</span> <span
+                                class="token keyword">ssl</span><span class="token punctuation">;</span>    <span
+                                class="token comment"># 之前未进行分流，故使用https默认的443端口</span>
+  <span class="token keyword">ssl</span> on<span class="token punctuation">;</span>
+  <span class="token keyword">ssl_certificate</span>       <span class="token operator">/</span>data<span
+                                class="token operator">/</span>${$("#v2ray-domain-name").val()}<span class="token operator">/</span>fullchain<span
+                                class="token punctuation">.</span>crt<span class="token punctuation">;</span> <span
+                                class="token comment"># 此处路径改为之前SSL证书安装路径</span>
+  <span class="token keyword">ssl_certificate_key</span>   <span class="token operator">/</span>data<span
+                                class="token operator">/</span>${$("#v2ray-domain-name").val()}<span class="token operator">/</span>privkey<span
+                                class="token punctuation">.</span>key<span class="token punctuation">;</span> <span
+                                class="token comment"># 此处路径改为之前SSL证书安装路径</span>
+  <span class="token keyword">ssl_protocols</span>         TLSv1 TLSv1<span class="token punctuation">.</span><span
+                                class="token number">1</span> TLSv1<span class="token punctuation">.</span><span
+                                class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">ssl_ciphers</span>           HIGH<span class="token punctuation">:</span><span
+                                class="token operator">!</span>aNULL<span class="token punctuation">:</span><span
+                                class="token operator">!</span>MD5<span class="token punctuation">;</span>
+  <span class="token keyword">server_name</span>           ${$("#v2ray-domain-name").val()}<span
+                                class="token punctuation">;</span>          <span
+                                class="token comment"># 此处修改为自己的域名</span>
+
+      <span class="token comment"># 将网站首页伪装成一个网页</span>
+      <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+        <span class="token keyword">root</span> <span class="token operator">/</span>var<span
+                                class="token operator">/</span>www<span class="token operator">/</span>moban<span
+                                class="token punctuation">;</span>  <span class="token comment"># 即之前下载的模板所在的路径</span>
+        <span class="token keyword">index</span> <span class="token keyword">index</span><span
+                                class="token punctuation">.</span>html<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+
+      <span class="token keyword">location</span> <span class="token operator">/</span>${$("#v2ray-ws-path").val()} <span
+                                class="token punctuation">{</span> <span class="token comment"># 与 V2Ray 配置中的 path 保持一致，建议自行修改，越复杂越好</span>
+      <span class="token keyword">proxy_redirect</span> off<span class="token punctuation">;</span>
+      <span class="token comment"># 设置WebSocket所在的端口位置，且需要与v2ray上的端口相一致；</span>
+      <span class="token keyword">proxy_pass</span> <span class="token keyword">http</span><span
+                                class="token punctuation">:</span><span class="token operator">/</span><span
+                                class="token operator">/</span><span class="token number">127.0</span><span
+                                class="token number">.0</span><span class="token number">.1</span><span
+                                class="token punctuation">:</span><span class="token number">${portNumber}</span><span
+                                class="token punctuation">;</span>
+      <span class="token keyword">proxy_http_version</span> <span class="token number">1.1</span><span
+                                class="token punctuation">;</span>
+      <span class="token keyword">proxy_set_header</span> Upgrade <span class="token variable">$http_upgrade</span><span
+                                class="token punctuation">;</span>
+      <span class="token keyword">proxy_set_header</span> Connection <span
+                                class="token string">"upgrade"</span><span class="token punctuation">;</span>
+      <span class="token keyword">proxy_set_header</span> Host <span class="token variable">$http_host</span><span
+                                class="token punctuation">;</span>
+
+      <span class="token comment"># Show realip in v2ray access.log</span>
+      <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Real<span
+                                class="token operator">-</span>IP <span class="token variable">$remote_addr</span><span
+                                class="token punctuation">;</span>
+      <span class="token keyword">proxy_set_header</span> X<span class="token operator">-</span>Forwarded<span
+                                class="token operator">-</span>For <span class="token variable">$proxy_add_x_forwarded_for</span><span
+                                class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</pre>
+
+
+
+        `)
+    }
+
+
+    function printV2rayConf(portNumber) {
+        $("#v2ray-conf").append(`<h3>v2ray 配置文件</h3>
+<pre data-role="codeBlock" data-info="json" class="language-json"><span
+                            class="token punctuation">{</span>
+  <span class="token property">"inbounds"</span><span class="token operator">:</span> <span
+                                class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"port"</span><span class="token operator">:</span> <span
+                                class="token number">${portNumber}</span><span class="token punctuation">,</span>        <span
+                                class="token comment">//对应此前在Nginx中设置的WebSocket监听端口</span>
+      <span class="token property">"listen"</span><span class="token operator">:</span><span
+                                class="token string">"127.0.0.1"</span><span
+                                class="token punctuation">,</span>
+      <span class="token property">"protocol"</span><span class="token operator">:</span> <span
+                                class="token string">"vmess"</span><span class="token punctuation">,</span>
+      <span class="token property">"settings"</span><span class="token operator">:</span> <span
+                                class="token punctuation">{</span>
+        <span class="token property">"clients"</span><span class="token operator">:</span> <span
+                                class="token punctuation">[</span>
+          <span class="token punctuation">{</span>
+            <span class="token property">"id"</span><span class="token operator">:</span> <span
+                                class="token string">"${$("#v2ray-uuid").val()}"</span><span
+                                class="token punctuation">,</span>
+            <span class="token comment">// 此处为混淆ID，建议数字不要过大，一般填2即可</span>
+            <span class="token property">"alterId"</span><span class="token operator">:</span> <span
+                                class="token number">${$("#v2ray-alertId").val()}</span>
+          <span class="token punctuation">}</span>
+        <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token property">"streamSettings"</span><span class="token operator">:</span> <span
+                                class="token punctuation">{</span>
+        <span class="token property">"network"</span><span class="token operator">:</span> <span
+                                class="token string">"ws"</span><span class="token punctuation">,</span>
+        <span class="token property">"wsSettings"</span><span class="token operator">:</span> <span
+                                class="token punctuation">{</span>
+        <span class="token property">"path"</span><span class="token operator">:</span> <span
+                                class="token string">"/${$("#v2ray-ws-path").val()}"</span> <span class="token comment">// 此处对应Nginx中设置的ws Direction</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"outbounds"</span><span class="token operator">:</span> <span
+                                class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"protocol"</span><span class="token operator">:</span> <span
+                                class="token string">"freedom"</span><span class="token punctuation">,</span>
+      <span class="token property">"settings"</span><span class="token operator">:</span> <span
+                                class="token punctuation">{</span><span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</pre>`)
+    }
+
+
+    function printTrojanNginx() {
+        $("#trojan-nginx").append(`<h3>trojan Nginx 配置文件</h3>
+         <pre data-role="codeBlock" data-info="nginx" class="language-nginx"><span class="token keyword">server</span> <span
+                            class="token punctuation">{</span>
+  <span class="token keyword">listen</span>  <span class="token number">80</span><span class="token punctuation">;</span>
+  <span class="token keyword">server_name</span>           ${$("#trojan-domain-name").val()}<span
+                                class="token punctuation">;</span>          <span
+                                class="token comment"># 此处修改为自己的域名</span>
+
+  <span class="token comment"># 将网站首页伪装成一个网页</span>
+  <span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">{</span>
+    <span class="token keyword">root</span> <span class="token operator">/</span>var<span
+                            class="token operator">/</span>www<span class="token operator">/</span>moban<span
+                            class="token punctuation">;</span>  <span class="token comment"># 即之前下载的模板所在的路径</span>
+    <span class="token keyword">index</span> <span class="token keyword">index</span><span
+                            class="token punctuation">.</span>html<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+}</pre>`)
+    }
+
+    function printTrojanConf(ifUpstream) {
+        if (ifUpstream == 1) {
+            var serverPort = 10241;
+        } else {
+            var serverPort = 443;
+        }
+
+        $("#trojan-conf").append(`<h3>trojan 配置文件</h3>
+        <pre data-role="codeBlock" data-info="json" class="language-json"><span
+                            class="token punctuation">{</span>
+  <span class="token property">"run_type"</span><span class="token operator">:</span> <span
+                                class="token string">"server"</span><span class="token punctuation">,</span>
+  <span class="token property">"local_addr"</span><span class="token operator">:</span> <span
+                                class="token string">"0.0.0.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"local_port"</span><span class="token operator">:</span> <span
+                                class="token number">${serverPort}</span><span class="token punctuation">,</span>
+  <span class="token property">"remote_addr"</span><span class="token operator">:</span> <span
+                                class="token string">"127.0.0.1"</span><span
+                                class="token punctuation">,</span>
+  <span class="token property">"remote_port"</span><span class="token operator">:</span> <span
+                                class="token number">80</span><span class="token punctuation">,</span>
+  <span class="token property">"password"</span><span class="token operator">:</span> <span
+                                class="token punctuation">[</span>
+      <span class="token string">"${$("#trojan-password").val()}"</span><span
+                                class="token punctuation">,</span>
+      <span class="token string">""</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"log_level"</span><span class="token operator">:</span> <span
+                                class="token number">1</span><span class="token punctuation">,</span>
+  <span class="token property">"ssl"</span><span class="token operator">:</span> <span
+                                class="token punctuation">{</span>
+      <span class="token property">"cert"</span><span class="token operator">:</span> <span
+                                class="token string">"/data/${$("#trojan-domain-name").val()}/fullchain.crt"</span><span
+                                class="token punctuation">,</span>
+      <span class="token property">"key"</span><span class="token operator">:</span> <span
+                                class="token string">"/data/${$("#trojan-domain-name").val()}/privkey.key"</span><span
+                                class="token punctuation">,</span>
+      <span class="token property">"key_password"</span><span class="token operator">:</span> <span
+                                class="token string">""</span><span class="token punctuation">,</span>
+      <span class="token property">"cipher"</span><span class="token operator">:</span> <span
+                                class="token string">"ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256"</span><span
+                                class="token punctuation">,</span>
+      <span class="token property">"prefer_server_cipher"</span><span class="token operator">:</span> <span
+                                class="token boolean">true</span><span class="token punctuation">,</span>
+      <span class="token property">"alpn"</span><span class="token operator">:</span> <span
+                                class="token punctuation">[</span>
+          <span class="token string">"http/1.1"</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"reuse_session"</span><span class="token operator">:</span> <span
+                                class="token boolean">true</span><span class="token punctuation">,</span>
+      <span class="token property">"session_ticket"</span><span class="token operator">:</span> <span
+                                class="token boolean">false</span><span class="token punctuation">,</span>
+      <span class="token property">"session_timeout"</span><span class="token operator">:</span> <span
+                                class="token number">600</span><span class="token punctuation">,</span>
+      <span class="token property">"plain_http_response"</span><span class="token operator">:</span> <span
+                                class="token string">""</span><span class="token punctuation">,</span>
+      <span class="token property">"curves"</span><span class="token operator">:</span> <span
+                                class="token string">""</span><span class="token punctuation">,</span>
+      <span class="token property">"dhparam"</span><span class="token operator">:</span> <span
+                                class="token string">""</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"tcp"</span><span class="token operator">:</span> <span
+                                class="token punctuation">{</span>
+      <span class="token property">"prefer_ipv4"</span><span class="token operator">:</span> <span
+                                class="token boolean">false</span><span class="token punctuation">,</span>
+      <span class="token property">"no_delay"</span><span class="token operator">:</span> <span
+                                class="token boolean">true</span><span class="token punctuation">,</span>
+      <span class="token property">"keep_alive"</span><span class="token operator">:</span> <span
+                                class="token boolean">true</span><span class="token punctuation">,</span>
+      <span class="token property">"fast_open"</span><span class="token operator">:</span> <span
+                                class="token boolean">false</span><span class="token punctuation">,</span>
+      <span class="token property">"fast_open_qlen"</span><span class="token operator">:</span> <span
+                                class="token number">20</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"mysql"</span><span class="token operator">:</span> <span
+                                class="token punctuation">{</span>
+      <span class="token property">"enabled"</span><span class="token operator">:</span> <span
+                                class="token boolean">false</span><span class="token punctuation">,</span>
+      <span class="token property">"server_addr"</span><span class="token operator">:</span> <span
+                                class="token string">"127.0.0.1"</span><span
+                                class="token punctuation">,</span>
+      <span class="token property">"server_port"</span><span class="token operator">:</span> <span
+                                class="token number">3306</span><span class="token punctuation">,</span>
+      <span class="token property">"database"</span><span class="token operator">:</span> <span
+                                class="token string">"trojan"</span><span class="token punctuation">,</span>
+      <span class="token property">"username"</span><span class="token operator">:</span> <span
+                                class="token string">"trojan"</span><span class="token punctuation">,</span>
+      <span class="token property">"password"</span><span class="token operator">:</span> <span
+                                class="token string">""</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</pre>`)
+
+    }
+
+    function allConf() {
+        let portNumber = parseInt(Math.random() * (19999 - 10000 + 1) + 10000, 10);
+
+        if ($("#v2ray-domain-name").val() && $("#v2ray-uuid").val() && $("#v2ray-alertId").val() && $("#v2ray-ws-path").val() && $("#trojan-domain-name").val() && $("#trojan-password").val()) {
+            $("#conf-results #v2ray-div").remove();
+            $("#conf-results #nginx-div").remove();
+            $("#conf-results #trojan-div").remove();
+
+            printNginxUpstreamResult();
+            printNginxUpstream($("#v2ray-domain-name").val(), $("#trojan-domain-name").val());
+
+            printV2rayResult();
+            printSSL($("#v2ray-domain-name").val(), "v2ray");
+            printV2rayNginx(portNumber, 1);
+            printV2rayConf(portNumber);
+
+            printTrojanResult();
+            printSSL($("#trojan-domain-name").val(), "trojan");
+            printTrojanNginx();
+            printTrojanConf(1);
+
+        } else {
+            alert("请确保您v2ray和trojan配置信息均输入完整");
+        }
+    }
+
+    function v2rayConf() {
+        let portNumber = parseInt(Math.random() * (19999 - 10000 + 1) + 10000, 10);
+        if ($("#v2ray-domain-name").val() && $("#v2ray-uuid").val() && $("#v2ray-alertId").val() && $("#v2ray-ws-path").val()) {
+            $("#conf-results #v2ray-div").remove();
+            $("#conf-results #nginx-div").remove();
+            $("#conf-results #trojan-div").remove();
+
+            printV2rayResult();
+            printSSL($("#v2ray-domain-name").val(), "v2ray");
+            printV2rayNginx(portNumber, 2);
+            printV2rayConf(portNumber);
+        } else {
+            alert("请确保您v2ray配置信息的输入完整");
+        }
+    }
+
+
+    function trojanConf() {
+        if ($("#trojan-domain-name").val() && $("#trojan-password").val()) {
+            $("#conf-results #v2ray-div").remove();
+            $("#conf-results #nginx-div").remove();
+            $("#conf-results #trojan-div").remove();
+            printTrojanResult();
+
+            printSSL($("#trojan-domain-name").val(), "trojan");
+            printTrojanNginx();
+            printTrojanConf(2);
+        } else {
+            alert("请确保您v2ray配置信息的输入完整");
+        }
+    }
+
+    $(function () {
+        $("#all-button").text("是");
+        $("#all-button").val(1);
+        $("#generate-buttons").append(
+            `<button type="btn" class="btn" id="generate-all-conf" onclick="allConf()"
+                        style="border-color: #C0D0AF;border-width: 0.1em; color:#C0D0AF; font-weight:bold">生成配置文件
+                </button>`);
+
+
+        $(".dropdown-menu").on('click', 'li', function () {
+            let buttons = [
+                `0`,
+                `<button type="btn" class="btn" id="generate-all-conf" onclick="allConf()"
+                        style="border-color: #C0D0AF;border-width: 0.1em; color:#C0D0AF; font-weight:bold">生成配置文件
+                </button>`,
+                `<div class="btn-group">
+                    <button type="btn" class="btn" id="generate-v2ray-conf" onclick="v2rayConf()"
+                            style="border-color: #FFD37A;border-width: 0.1em; color:#FFD37A; font-weight:bold">生成v2ray配置文件
+                    </button>
+                    <button type="btn" class="btn" id="generate-trojan-conf" onclick="trojanConf()"
+                            style="border-color: #F7E077;border-width: 0.1em; color: #F7E077; font-weight:bold">生成trojan配置文件
+                    </button>
+                </div>`];
+
+            $("#all-button").text($(this).text());
+            $("#all-button").val($(this).val());
+            $("#generate-buttons").empty();
+            $("#generate-buttons").append(buttons[$(this).val()]);
+        })
+
+        $("#generate-uuid").on('click', function () {
+            $("#v2ray-uuid").empty();
+            $("#v2ray-uuid").val(uuid());
+        })
+
+        $("#generate-v2ray-conf").on('click', function () {
+            if ($("#v2ray-domain-name").val() && $("#v2ray-uuid").val() && $("#v2ray-alertId").val() && $("#v2ray-ws-path").val()) {
+                if ($("#all-button").val() == 1 && (!$("#trojan-domain-name").val())) {
+                    alert("请输入trojan的域名，若不想同时搭建v2ray和trojan请将在是否分流处选择“否”！")
+                } else {
+                    $("#conf-results #v2ray-div").empty();
+                    $("#conf-results #nginx-div").empty();
+
+                    if ($("#all-button").val() == 1) {
+                        printNginxUpstreamResult();
+                        printNginxUpstream($("#v2ray-domain-name").val(), $("#trojan-domain-name").val());
+                    }
+                    printV2rayResult();
+                    printSSL($("#v2ray-domain-name").val(), "v2ray");
+                }
+
+
+            } else {
+                alert("请确保您v2ray配置信息的输入完整");
+            }
+        })
+    })
+
+
+</script>
+</body>
+</html>
