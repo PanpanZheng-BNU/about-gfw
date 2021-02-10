@@ -1050,7 +1050,7 @@ stream <span class="token punctuation">{</span>
                             class="token punctuation">{</span>
   <span class="token keyword">listen</span>  <span class="token number">${nginxPort}</span> <span
                                 class="token keyword">ssl</span><span class="token punctuation">;</span>    <span
-                                class="token comment"># 之前未进行分流，故使用https默认的443端口</span>
+                                class="token comment"># 若之前未进行分流，使用https默认的443端口，否则使用分流后的端口10242</span>
   <span class="token keyword">ssl</span> on<span class="token punctuation">;</span>
   <span class="token keyword">ssl_certificate</span>       <span class="token operator">/</span>data<span
                                 class="token operator">/</span>${$("#v2ray-domain-name").val()}<span class="token operator">/</span>fullchain<span
